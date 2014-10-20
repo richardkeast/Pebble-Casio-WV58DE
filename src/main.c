@@ -32,6 +32,7 @@ char yyyyBuffer[] = "0000";
 char hhmmBuffer[] = "00:00";
 char ssBuffer[] = "00";
 char wdBuffer[] = "XXX";
+bool _connected = true;
 
 //-----------------------------------------------------------------------------------------------------------------------
 char *upcase(char *str) {
@@ -58,6 +59,11 @@ void battery_state_service_handler(BatteryChargeState charge_state)
 void bluetooth_connection_handler(bool connected)
 {
 	layer_set_hidden(bitmap_layer_get_layer(radio_layer), connected != true);
+   if (_connected != connected)
+   {
+      vibes_enqueue_custom_pattern(vibe_pat);
+   }
+   _connected = connected;
 }
 //-----------------------------------------------------------------------------------------------------------------------
 void tick_handler(struct tm *tick_time, TimeUnits units_changed)
