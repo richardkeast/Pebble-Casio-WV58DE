@@ -27,8 +27,7 @@ static GBitmap *background, *radio, *batteryAll;
 static GFont digitS, digitM, digitL;
 static CfgDta_t CfgData;
 
-char ddmmBuffer[] = "00-00";
-char yyyyBuffer[] = "0000";
+char ddmmBuffer[] = "00-00-0000";
 char hhmmBuffer[] = "00:00";
 char ssBuffer[] = "00";
 char wdBuffer[] = "XXX";
@@ -84,18 +83,15 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 		text_layer_set_text(hhmm_layer, hhmmBuffer);
 		
 		strftime(ddmmBuffer, sizeof(ddmmBuffer), 
-			CfgData.datefmt == 1 ? "%d-%m" : 
-			CfgData.datefmt == 2 ? "%d/%m" : 
-			CfgData.datefmt == 3 ? "%m/%d" : "%d.%m", tick_time);
+			CfgData.datefmt == 1 ? "%d-%m-%Y" : 
+			CfgData.datefmt == 2 ? "%d/%m/%Y" : 
+			CfgData.datefmt == 3 ? "%m/%d/%Y" : "%d.%m.%Y", tick_time);
 		//snprintf(ddmmBuffer, sizeof(ddmmBuffer), "%d", rc.origin.x);
 		text_layer_set_text(ddmm_layer, ddmmBuffer);
 		
 		strftime(wdBuffer, sizeof(wdBuffer), "%a", tick_time);
 		upcase(wdBuffer);
 		text_layer_set_text(wd_layer, wdBuffer);
-
-		strftime(yyyyBuffer, sizeof(yyyyBuffer), "%Y", tick_time);
-		text_layer_set_text(yyyy_layer, yyyyBuffer);
 
 		//Check DST at 4h at morning
 		if ((tick_time->tm_hour == 4 && tick_time->tm_min == 0) || units_changed == MINUTE_UNIT)
@@ -205,20 +201,12 @@ void window_load(Window *window)
 	digitL = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_RESOURCE_ID_FONT_DIGITAL_55));
   
 	//DAY+MONTH layer
-	ddmm_layer = text_layer_create(GRect(2, 5, 70, 32));
+	ddmm_layer = text_layer_create(GRect(2, 5, 154, 32));
 	text_layer_set_background_color(ddmm_layer, GColorClear);
 	text_layer_set_text_color(ddmm_layer, GColorBlack);
 	text_layer_set_text_alignment(ddmm_layer, GTextAlignmentCenter);
 	text_layer_set_font(ddmm_layer, digitS);
 	layer_add_child(window_layer, text_layer_get_layer(ddmm_layer));
-        
-	//YEAR layer
-	yyyy_layer = text_layer_create(GRect(82, 5, 60, 32));
-	text_layer_set_background_color(yyyy_layer, GColorClear);
-	text_layer_set_text_color(yyyy_layer, GColorBlack);
-	text_layer_set_text_alignment(yyyy_layer, GTextAlignmentCenter);
-	text_layer_set_font(yyyy_layer, digitS);
-	layer_add_child(window_layer, text_layer_get_layer(yyyy_layer));
         
 	//HOUR+MINUTE layer
 	hhmm_layer = text_layer_create(GRect(2, 50, 110, 75));
@@ -275,7 +263,6 @@ void window_unload(Window *window)
 {
 	//Destroy text layers
 	text_layer_destroy(ddmm_layer);
-	text_layer_destroy(yyyy_layer);
 	text_layer_destroy(hhmm_layer);
 	text_layer_destroy(ss_layer);
 	text_layer_destroy(wd_layer);
